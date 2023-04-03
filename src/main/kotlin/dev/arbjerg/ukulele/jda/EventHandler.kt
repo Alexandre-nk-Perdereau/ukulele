@@ -17,6 +17,23 @@ class EventHandler(private val commandManager: CommandManager) : ListenerAdapter
 
     override fun onGuildMessageReceived(event: GuildMessageReceivedEvent) {
         if (event.isWebhookMessage || event.author.isBot) return
+
+        val guild = event.guild
+        val member = event.member
+        val message = event.message
+        val content = message.contentRaw
+        val questionRoleName = "Inquisiteur"
+
+        if (member?.roles?.find { it.name == questionRoleName } != null) {
+            if (content.contains("?")) {
+                val response = if (member.effectiveName != null) {
+                    "Non ${member.effectiveName}"
+                } else {
+                    "Non ${member.user.name}"
+                }
+                message.channel.sendMessage(response).queue()
+            }
+        }
         commandManager.onMessage(event.guild, event.channel, event.member!!, event.message)
     }
 
